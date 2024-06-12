@@ -1,0 +1,27 @@
+name: Deploy ACC
+
+on:
+  push:
+    branches: main
+
+jobs:
+  cd:
+    name: Deploy acceptance
+    runs-on: self-hosted
+    steps:
+      - name: Deploy to acceptance
+        run: |
+          cd ~
+          ssh ap109 '
+            if [ -d "dwh-airbyte" ]
+            then
+              cd ~/dwh-airbyte
+              git pull git@github-dwh-airbyte:nrcmedia/dwh-airbyte.git main
+            else
+              git clone -b main --single-branch git@github-dwh-airbyte:nrcmedia/dwh-airbyte.git
+              cd ~/dwh-airbyte
+            fi
+
+            docker compose down
+            ./run-ab-platform.sh &
+          '
